@@ -102,7 +102,32 @@
 
 </script>
 
+
+
+
+<script type="text/javascript">
+	function cutsecondtitle(title){
+	var shorttitlestr = title;
+	var shorttitlearr = title.split(" - ");
+		
+		if (shorttitlearr.length > 1) {
+			
+			if (shorttitlearr[0] == "3D") {
+				shorttitlestr = shorttitlearr[0] + " - " + shorttitlearr[1];
+			} else {
+				shorttitlestr = shorttitlearr[0];
+			}
+		}
+	
+	return shorttitlestr;
+
         
+    }
+
+</script>
+ 
+			
+			
 			
         <script type="text/javascript">
             function loaddata(events) {
@@ -121,7 +146,7 @@
 						
 						    //...set date; source date = 00/00
                                 
-                            if (parseInt(event.days[d].day.split("/")[0]) == (new Date).getDate() - 10 && parseInt(event.days[d].day.split("/")[1]) == (new Date).getMonth() + 1 - 8 && parseInt(event.days[d].day.split("/")[2]) == (new Date).getFullYear()) {
+                            if (parseInt(event.days[d].day.split("/")[0]) == (new Date).getDate() - 28 && parseInt(event.days[d].day.split("/")[1]) == (new Date).getMonth() + 1 - 8 && parseInt(event.days[d].day.split("/")[2]) == (new Date).getFullYear()) {
                                 if (event.days[d].performances.length > 0) {
                                     var performances = event.days[d].performances;
                                     
@@ -184,7 +209,7 @@
 									}
 									
 									// $("table").append("<tr><td><span class='titolo'>" + event.title + "</td><td><span class='vietato'>" + vietato + "</span>" + "     " + "<span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
-									$("table").append("<tr><td><span class='titolo'>" + event.title + "</span>" + "     " + "<span class='vietato'>" + vietato + "</span>" + "</td><td><span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
+									$("table").append("<tr><td><span class='titolo'>" + cutsecondtitle(event.title) + "</span>" + "     " + "<span class='vietato'>" + vietato + "</span>" + "</td><td><span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
 
 									$("tr:even td").css("padding-top", padding + "px");
 									$("tr:odd td").css("padding-bottom", padding + "px");
@@ -277,14 +302,14 @@
                                               {
                                               "hour": "20.20",
                                               "freeSeat": 10,
-                                              "room": "Genova"
+                                              "room": "Venezia"
                                               }
                                               ]
                                              }
                                              ]
                                             },
-											/*{
-                                            "title": "LA COPPIA DEI CAMPIONI",
+											{
+                                            "title": "3D - LA COPPIA DEI CAMPIONI",
                                             "director": "GIULIO BASE",
                                             "actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
                                             "storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
@@ -427,7 +452,7 @@
                                               ]
                                              }
                                              ]
-                                            } */
+                                            } 
                                             ];
                                   
 					$invirtheight = 0;
