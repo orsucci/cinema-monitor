@@ -5,435 +5,521 @@
         <link href="monitor-files/monitor.css" rel="stylesheet" type="text/css">
         
 		<script type="text/javascript">				// dimensionamento tabella in base al numeri di eventi
-        function resizetable(events) {
-		$("table tr:even").each(function(){
-        $(this).find("td").eq(0).find(".titolo").wrap("<div class='cut'></div>"); //...
-        });
 			
-			var cutwidth = 1000;
-									
-				switch (events.length) {
-				case 1:
-				cutwidth = 900;
-				break;
-				case 2:
-				cutwidth = 900;
-				break;
-				case 3:
-				cutwidth = 910;
-				break;
-				case 4:
-				cutwidth = 940;
-				break;
-				case 5:
-				cutwidth = 940;
-				break;
-				default:
-				cutwidth = 1000;
-				break;
+			//return 'none' se niente, 'all' se entrambi, 'one' se ha vm o se ha 3d
+			function getVmAnd3d(events){
+				let result = 'none';
+				let string3d = false;
+				let vm = false;
+				for (let e = 0; e < events.length; e++) {
+					let event = events[e];
+					let shorttitle3darr = cutsecondtitle(event.title);
+					let shorttitlestr = "";
+					if (shorttitle3darr.length == 2){
+						shorttitlestr = shorttitle3darr[0];
+						if (shorttitle3darr[1] == 1){
+							string3d = true;
+						}
+					}
+					
+					if (event.vm > 0) {
+						vm = true;
+					}
+					
+					if(vm && string3d){
+						return 'all';
+					}
+					
+					if(vm || string3d){
+						result = 'one';
+					}
+					
+					string3d = false;
+					vm = false;
 				}
-									
 				
-            $(".cut").css("width", cutwidth + "px"); 
+				return result;
+			}
+			
+			function resizetable(events) {
+			$("table tr:even").each(function(){
+			$(this).find("td").eq(0).find(".titolo").wrapInner("<div class='cut'></div>"); //...
+			});
 				
-			var fontsize = 100;
 				
-			if ($.type($("table tr:even").css("font-size")) == "string") {
-				if ($("table tr:even").css("font-size").split("px") > 0) {
-					fontsize = $("table tr:even").css("font-size").split("px")[0];
+				let VmAnd3d = getVmAnd3d(events);
+				console.log(VmAnd3d);
+				
+				var cutwidth = 1000;
+										
+					switch (events.length) {
+					case 1:
+					cutwidth = 900;
+					break;
+					case 2:
+					cutwidth = 900;
+					break;
+					case 3:
+					if (VmAnd3d === 'all'){
+						cutwidth = 850;
+					} else if(VmAnd3d === 'one') {
+						cutwidth = 900;
+					} else {
+						cutwidth = 950;
+					}
+					break;
+					case 4:
+					cutwidth = 990;
+					break;
+					case 5:
+					cutwidth = 940;
+					break;
+					default:
+					cutwidth = 1000;
+					break;
+					}
+										
+					
+				$(".cut").css("width", cutwidth + "px"); 
+					
+				var fontsize = 100;
+					
+				if ($.type($("table tr:even").css("font-size")) == "string") {
+					if ($("table tr:even").css("font-size").split("px") > 0) {
+						fontsize = $("table tr:even").css("font-size").split("px")[0];
+					}
+				}
+					
+				   for (var z = 1; z < fontsize; z++) {
+					if ($("table").height() > 720) {
+						$("table tr:even").css("font-size", fontsize - z + "px");
+						$("table tr:odd").css("font-size", (fontsize - z) / 1.5  + "px");
+					} else {
+						break;
+					}
 				}
 			}
-                
-               for (var z = 1; z < fontsize; z++) {
-                if ($("table").height() > 720) {
-                    $("table tr:even").css("font-size", fontsize - z + "px");
-                    $("table tr:odd").css("font-size", (fontsize - z) / 1.5  + "px");
-                } else {
-                    break;
-                }
-            }
-        }
         </script>
 		
 		
 		<script type="text/javascript">				//colore carattere  - riferito ai posti liberi rimasti
-		function signseatscolor(room, seats){
-        var relseats = seats / $maxseats[room.toLowerCase()];
-        var signcolor = "white";
-        
-		if (relseats >= 1) {
-            signcolor = "posti100";
-        } else {
-            if (relseats > 0.5) {
-                signcolor = "posti50";
-            } else {
-                if (relseats > 0.2) {
-                    signcolor = "posti20";
-                } else {
-                    signcolor = "posti0";
-                }
-            }
-        } 
-        return signcolor;
-		}
+			function signseatscolor(room, seats){
+			var relseats = seats / $maxseats[room.toLowerCase()];
+			var signcolor = "white";
+			
+			if (relseats >= 1) {
+				signcolor = "posti100";
+			} else {
+				if (relseats > 0.5) {
+					signcolor = "posti50";
+				} else {
+					if (relseats > 0.2) {
+						signcolor = "posti20";
+					} else {
+						signcolor = "posti0";
+					}
+				}
+			} 
+			return signcolor;
+			}
 		</script>
 
 
-		<script type="text/javascript">				// taglio del secondo titolo e riposizionamento tag 3D
-		function cutsecondtitle(title){			
-		var shorttitlestr = title;
-		var shorttitlearr = title.split(" - ");		
-		
-		if (shorttitlearr.length > 1) {
-			if (shorttitlearr[0] == "3D") {
-				shorttitlestr = shorttitlearr[1] + " - " + shorttitlearr[0];
-			} else {
-				shorttitlestr = shorttitlearr[0];
+		/*<script type="text/javascript">				// taglio del secondo titolo e riposizionamento tag 3D
+			function cutsecondtitle(title){			
+			var shorttitle3darr = [];
+			var shorttitlestr = title;
+			var shorttitlearr = title.split(" - ");		
+			
+			
+			if (shorttitlearr.length > 1) {
+				if (shorttitlearr[0] == "3D") {
+					shorttitle3darr[1] = 1;
+					shorttitle3darr[0] = shorttitlearr[1];
+				} else {
+					shorttitle3darr[1] = 0;
+					shorttitle3darr[0] = shorttitlearr[0];
+				}
 			}
-		}
-		return shorttitlestr;
-		}
+			
+			return shorttitle3darr;
+			}
+		</script>*/
+		
+		
+		<script type="text/javascript">				// taglio del secondo titolo e riposizionamento tag 3D
+			function cutsecondtitle(title){			
+			
+			var shorttitlestr = title;
+			var int3d = 0;
+			var shorttitlearr = title.split(" - ");	
+					
+			
+			
+			if (shorttitlearr.length > 1) {
+				if (shorttitlearr[0] == "3D") {
+					shorttitlestr = shorttitlearr[1];
+					int3d = 1;
+				} else {
+					shorttitlestr = shorttitlearr[0];
+					int3d = 0;
+				}
+			}
+			var shorttitle3darr = [shorttitlestr,int3d];	
+			return shorttitle3darr;
+			}
 		</script>
  
 			
         <script type="text/javascript">				// creazione tabella
-		function loaddata(events) {
-			$("table").empty();
-			
-			for (var e = 0; e < events.length; e++) {
-				var event = events[e];
-				var vietato = "";
+			function loaddata(events) {
+				$("table").empty();
 				
-				for (var d = 0; d < event.days.length; d++) {
-				
-				if (event.vm > 0) {
-					vietato = "VM" + event.vm;
-					}	
-					if (event.days[d].day.split("/").length == 3) {
+				for (var e = 0; e < events.length; e++) {
+					var event = events[e];
+					var vietato = "";
 					
-						//...set date; source date = 00/00
-							
-						if (parseInt(event.days[d].day.split("/")[0]) == (new Date).getDate() - 1 && parseInt(event.days[d].day.split("/")[1]) == (new Date).getMonth() + 1 - 9 && parseInt(event.days[d].day.split("/")[2]) == (new Date).getFullYear()) {
-							if (event.days[d].performances.length > 0) {
-								var performances = event.days[d].performances;
+					for (var d = 0; d < event.days.length; d++) {
+					
+					if (event.vm > 0) {
+						vietato = "VM" + event.vm;
+						}	
+						if (event.days[d].day.split("/").length == 3) {
+						
+							//...set date; source date = 00/00
 								
-								var timesarr = [];
-								
-								for (var p = 0; p < performances.length; p++) {
-									timesarr.push(performances[p].hour);
-								}
-								
-								timesarr.sort(function(a, b) {
-									return a - b;
-								});
-											  
-								var timetable = "";
-								var nexttime = "";
-								var room = "";
-								var seats = 0;
-											  
-								for (var t = 0 ; t < timesarr.length; t++) { //...set shows number; default: var t = 0
+							if (parseInt(event.days[d].day.split("/")[0]) == (new Date).getDate() - 13 && parseInt(event.days[d].day.split("/")[1]) == (new Date).getMonth() + 1 - 9 && parseInt(event.days[d].day.split("/")[2]) == (new Date).getFullYear()) {
+								if (event.days[d].performances.length > 0) {
+									var performances = event.days[d].performances;
+									
+									var timesarr = [];
+									
 									for (var p = 0; p < performances.length; p++) {
-										if (parseInt(performances[p].hour.replace(".","")) == parseInt(timesarr[t].replace(".",""))) {
-											timetable = timetable + performances[p].hour;
-														  
-											if (t < timesarr.length - 1) {
-												timetable = timetable + "  -  ";
+										timesarr.push(performances[p].hour);
+									}
+									
+									timesarr.sort(function(a, b) {
+										return a - b;
+									});
+												  
+									var timetable = "";
+									var nexttime = "";
+									var room = "";
+									var seats = 0;
+												  
+									for (var t = 0 ; t < timesarr.length; t++) { //...set shows number; default: var t = 0
+										for (var p = 0; p < performances.length; p++) {
+											if (parseInt(performances[p].hour.replace(".","")) == parseInt(timesarr[t].replace(".",""))) {
+												timetable = timetable + performances[p].hour;
+															  
+												if (t < timesarr.length - 1) {
+													timetable = timetable + "  -  ";
+												}
+															  
+												if (t == 0) {
+													nexttime = performances[p].hour;
+													room = performances[p].room;
+													seats = performances[p].freeSeat;
+												}
+															  
+												break;
 											}
-														  
-											if (t == 0) {
-												nexttime = performances[p].hour;
-												room = performances[p].room;
-												seats = performances[p].freeSeat;
-											}
-														  
-											break;
 										}
 									}
+
+
+									var padding = 200;
+									
+									switch (events.length) {
+									
+									case 1:
+									padding = 280;
+									break;
+									case 2:
+									padding = 110;
+									break;
+									case 3:
+									padding = 50;
+									break;
+									case 4:
+									padding = 30;
+									break;
+									default:
+									padding = 10;
+									break;
+									
+									}
+									
+									var shorttitle3darr = cutsecondtitle(event.title);
+									var shorttitlestr = "";
+									var str3d = "";
+									
+										if (shorttitle3darr.length == 2){
+										shorttitlestr = shorttitle3darr[0];
+											if (shorttitle3darr[1] == 1){
+												str3d = "3D";
+											}
+										}
+									
+									$("table").append("<tr><td><span class='titolo'>" + shorttitlestr + "</span>" + "     " +"<span class='tred'>" + str3d + "</span>" + "<span class='vietato'>" + vietato + "</span>" + "</td><td><span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
+
+									$("tr:even td").css("padding-top", padding + "px");
+									$("tr:odd td").css("padding-bottom", padding + "px");
 								}
-
-
-								var padding = 200;
-								
-								switch (events.length) {
-								
-								case 1:
-								padding = 280;
 								break;
-								case 2:
-								padding = 110;
-								break;
-								case 3:
-								padding = 50;
-								break;
-								case 4:
-								padding = 30;
-								break;
-								default:
-								padding = 10;
-								break;
-								
-								}
-								
-								$("table").append("<tr><td><span class='titolo'>" + cutsecondtitle(event.title) + "</span>" + "     " + "<span class='vietato'>" + vietato + "</span>" + "</td><td><span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
-
-								$("tr:even td").css("padding-top", padding + "px");
-								$("tr:odd td").css("padding-bottom", padding + "px");
 							}
-							break;
 						}
 					}
 				}
 			}
-		}
         </script>
         
 		
 		<script type="text/javascript">				// lettura dati
-		function getdata() {
-			//$.getJSON("http://192.168.1.20:8080/Cinema/getMonitor", function(events) {
-				
-				var events = [];
-				
-				if ($.type($data) == "array") {
-					for (var p = 0; p < $data.length; p++) { //...set events number; default: p = 0; p < $data.length
-						if ($.type($data[p].title) == "string") {
-							events.push($data[p]);
+			function getdata() {
+				//$.getJSON("http://192.168.1.20:8080/Cinema/getMonitor", function(events) {
+					
+					var events = [];
+					
+					if ($.type($data) == "array") {
+						for (var p = 0; p < $data.length; p++) { //...set events number; default: p = 0; p < $data.length
+							if ($.type($data[p].title) == "string") {
+								events.push($data[p]);
+							}
 						}
 					}
-				}
-			
-				if ($invirtheight != $fnvirtheight) {
-					$("table").hide(0);
-				}
-				  
-				if ($.type(events) == "array") {
-					loaddata(events);
-				}
-				  
-				$invirtheight = $("table").height();
-				resizetable(events);
-				  
-				if ($invirtheight != $fnvirtheight) {
-					$("table").hide(0);
-					setTimeout(function(){
+				
+					if ($invirtheight != $fnvirtheight) {
+						$("table").hide(0);
+					}
+					  
+					if ($.type(events) == "array") {
 						loaddata(events);
-						$invirtheight = $("table").height();
-						resizetable(events);
-						$("table").show(0);
-						$fnvirtheight = $invirtheight;
-					},100);
-				} else {
-					  $("table").show(0);
-					  $fnvirtheight = $invirtheight;
-				}
-			//...});
-		}
+					}
+					  
+					$invirtheight = $("table").height();
+					resizetable(events);
+					  
+					if ($invirtheight != $fnvirtheight) {
+						$("table").hide(0);
+						setTimeout(function(){
+							loaddata(events);
+							$invirtheight = $("table").height();
+							resizetable(events);
+							$("table").show(0);
+							$fnvirtheight = $invirtheight;
+						},100);
+					} else {
+						  $("table").show(0);
+						  $fnvirtheight = $invirtheight;
+					}
+				//...});
+			}
         </script>
         
 		
 		<script type="text/javascript">				// dati offline per test
-		$(document).ready(function() {
-			$data =  [
-			{
-			"title": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
-			"director": "GIULIO BASE",
-			"actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
-			"storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
-			"vm": 18,
-			"posterName": "LACOPPIADEICAMPIONI.jpg",
-			"category": "COMMEDIA",
-			"runtime": "95",
-			"days":
-			[
-			 {
-			 "day": "00/00/2016",
-			 "performances":
-			 [
-			  {
-			  "hour": "22.30",
-			  "freeSeat": 146,
-			  "room": "Genova"
-			  },
-			  {
-			  "hour": "20.20",
-			  "freeSeat": 10,
-			  "room": "Venezia"
-			  }
-			  ]
-			 }
-			 ]
-			},
-			{
-			"title": "3D - LA COPPIA DEI CAMPIONI",
-			"director": "GIULIO BASE",
-			"actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
-			"storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
-			"vm": 0,
-			"posterName": "LACOPPIADEICAMPIONI.jpg",
-			"category": "COMMEDIA",
-			"runtime": "95",
-			"days":
-			[
-			 {
-			 "day": "00/00/2016",
-			 "performances":
-			 [
-			  {
-			  "hour": "22.30",
-			  "freeSeat": 146,
-			  "room": "Genova"
-			  },
-			  {
-			  "hour": "20.20",
-			  "freeSeat": 146,
-			  "room": "Genova"
-			  }
-			  ]
-			 }
-			 ]
-			},
-			{
-			"title": "DA MONET A MATISSE - L'ARTE DI DIPINGERE IL GIARDINO MODERNO",
-			"director": "PATRICIO GUZMAN",
-			"storyline": "Un bottone di madreperla incrostato nella ruggine di una rotaia in fondo al mare: è una traccia dei desaparecidos di Villa Grimaldi a Santiago, il grande centro cileno di detenzione e tortura sotto la dittatura di Pinochet. Un fiume che scorre e il tintinnio delle cascate: è la canzone dell'acqua alla base della cultura dei Selknams, popolazione nativa sudamericana trucidata dai colonizzatori. Due massacri, e la memoria dell'acqua: sono le chiavi narrative per raccontare la storia di un Paese e delle sue ferite ancora aperte, per percorrere il Cile e la sua bellezza, il Cile e la sua violenza.",
-			"vm": 18,
-			"posterName": "LAMEMORIADELLACQUA.jpg",
-			"category": "DOCUMENTARIO",
-			"runtime": "90",
-			"days":
-			[
-			 {
-			 "day": "00/00/2016",
-			 "performances":
-			 [
-			  {
-			  "hour": "20.00",
-			  "freeSeat": 143,
-			  "room": "Amalfi"
-			  },
-			  {
-			  "hour": "20.30",
-			  "freeSeat": 143,
-			  "room": "Amalfi"
-			  }
-			  ]
-			 }
-			 ]
-			},
-			/*{
-			"title": "LO STATO CONTRO FRITZ BAUER",
-			"director": "LARS KRAUME",
-			"actors": "Burghart Klaußner, Ronald Zehrfeld, Lilith Stangenberg, Jörg Schüttauf, Sebastian Blomberg, Laura Tonke, Götz Schubert, Cornelia Gröschel, Robert Atzorn, Michael Schenk, Rüdiger Klink, Matthias Weidenhöfer, Dani Levy",
-			"storyline": "Germania, 1957. Il procuratore generale Fritz Bauer ottiene prove irrefutabili del luogo dove si nasconde Adolf Eichmann. Il tenente colonnello delle SS responsabile della deportazione di massa di milioni di ebrei cela la sua vera identità nella capitale argentina di Buenos Aires. Ebreo lui stesso, da quando è tornato dall'esilio in Danimarca, Bauer sta cercando di portare in giudizio i criminali del Terzo Reich. Tuttavia, finora non è riuscito ad ottenere alcun risultato a causa della feroce determinazione della Germania a rimuovere il suo sinistro passato. Diffidando del sistema giudiziario tedesco, Fritz Bauer contatta il Mossad, i servizi segreti israeliani, e così facendo commette alto tradimento. Ma Bauer non sta cercando di vendicare l'Olocausto: la sua preoccupazione è il futuro della Germania.",
-			"vm": 14,
-			"posterName": "LOSTATOCONTROFRITZBAUER.jpg",
-			"category": "DRAMMATICO",
-			"runtime": "105",
-			"days":
-			[
-			 {
-			 "day": "00/00/2016",
-			 "performances":
-			 [
-			  {
-			  "hour": "20.00",
-			  "freeSeat": 270,
-			  "room": "Venezia"
-			  },
-			  {
-			  "hour": "22.30",
-			  "freeSeat": 270,
-			  "room": "Venezia"
-			  }
-			  ]
-			 }
-			 ]
-			},
-			{
-			"title": "BENVENUTI MA NON TROPPO - BENVENUTI MA NON TROPPO",
-			"director": "Alexandra Leclère",
-			"actors": "Karin Viard, Didier Bourdon, Valérie Bonneton, Michel Vuillermoz, Josiane Balasko, Patrick Chesnais, Firmine Richard, Michèle Moretti, Anémone, Jackie Berroyer, Sandra Zidani, Pauline Vaubaillon, Marie-Philomène Nga, Priscilla Adade",
-			"storyline": "A causa di un inverno particolarmente rigido, il governo francese indice misure speciali, obbligando i cittadini più benestanti ad accogliere in casa propria le persone meno fortunate che non possono permettersi un?abitazione. Un vento di panico si scatena in tutta la Francia, soprattutto al civico 86 di rue du Cherche Midi, dove sorge un lussuoso palazzo dell?area più esclusiva del centro parigino. Proprio qui abitano la famiglia Dubreuil, d?estrazione borghese e conservatrice, e i coniugi Bretzel, intellettuali e radical chic. La monotonia del condominio verrà messa a soqquadro da questa coabitazione forzata, e nel confronto con i senzatetto i protagonisti scopriranno la loro indole più autentica.",
-			"vm": 0,
-			"posterName": "BENVENUTIMANONTROPPO.jpg",
-			"category": "COMMEDIA",
-			"runtime": "106",
-			"days":
-			[
-			 {
-			 "day": "00/00/2016",
-			 "performances":
-			 [
-			  {
-			  "hour": "22.30",
-			  "freeSeat": 10,
-			  "room": "Amalfi"
-			  },
-			  {
-			  "hour": "22.20",
-			  "freeSeat": 10,
-			  "room": "Amalfi"
-			  }
-			  ]
-			 }
-			 ]
-			}
-			,
-			{
-			"title": "TARTARUGHE NINJA",
-			"director": "Alexandra Leclère",
-			"actors": "Karin Viard, Didier Bourdon, Valérie Bonneton, Michel Vuillermoz, Josiane Balasko, Patrick Chesnais, Firmine Richard, Michèle Moretti, Anémone, Jackie Berroyer, Sandra Zidani, Pauline Vaubaillon, Marie-Philomène Nga, Priscilla Adade",
-			"storyline": "A causa di un inverno particolarmente rigido, il governo francese indice misure speciali, obbligando i cittadini più benestanti ad accogliere in casa propria le persone meno fortunate che non possono permettersi un?abitazione. Un vento di panico si scatena in tutta la Francia, soprattutto al civico 86 di rue du Cherche Midi, dove sorge un lussuoso palazzo dell?area più esclusiva del centro parigino. Proprio qui abitano la famiglia Dubreuil, d?estrazione borghese e conservatrice, e i coniugi Bretzel, intellettuali e radical chic. La monotonia del condominio verrà messa a soqquadro da questa coabitazione forzata, e nel confronto con i senzatetto i protagonisti scopriranno la loro indole più autentica.",
-			"vm": 14,
-			"posterName": "BENVENUTIMANONTROPPO.jpg",
-			"category": "COMMEDIA",
-			"runtime": "106",
-			"days":
-			[
-			 {
-			 "day": "00/00/2016",
-			 "performances":
-			 [
-			  {
-			  "hour": "22.30",
-			  "freeSeat": 10,
-			  "room": "Amalfi"
-			  },
-			  {
-			  "hour": "20.00",
-			  "freeSeat": 60,
-			  "room": "Amalfi"
-			  }
-			  ]
-			 }
-			 ]
-			} */
-			];
+			$(document).ready(function() {
+				$data =  [
+				{
+				"title": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+				"director": "GIULIO BASE",
+				"actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
+				"storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
+				"vm": 14,
+				"posterName": "LACOPPIADEICAMPIONI.jpg",
+				"category": "COMMEDIA",
+				"runtime": "95",
+				"days":
+				[
+				 {
+				 "day": "00/00/2016",
+				 "performances":
+				 [
+				  {
+				  "hour": "22.30",
+				  "freeSeat": 146,
+				  "room": "Genova"
+				  },
+				  {
+				  "hour": "20.20",
+				  "freeSeat": 10,
+				  "room": "Venezia"
+				  }
+				  ]
+				 }
+				 ]
+				},
+				{
+				"title": "3D - LA COPPIA DEI CAMPIONI",
+				"director": "GIULIO BASE",
+				"actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
+				"storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
+				"vm": 14,
+				"posterName": "LACOPPIADEICAMPIONI.jpg",
+				"category": "COMMEDIA",
+				"runtime": "95",
+				"days":
+				[
+				 {
+				 "day": "00/00/2016",
+				 "performances":
+				 [
+				  {
+				  "hour": "22.30",
+				  "freeSeat": 146,
+				  "room": "Genova"
+				  },
+				  {
+				  "hour": "20.20",
+				  "freeSeat": 146,
+				  "room": "Genova"
+				  }
+				  ]
+				 }
+				 ]
+				},
+				{
+				"title": "DA MONET A MATISSE - L'ARTE DI DIPINGERE IL GIARDINO MODERNO",
+				"director": "PATRICIO GUZMAN",
+				"storyline": "Un bottone di madreperla incrostato nella ruggine di una rotaia in fondo al mare: è una traccia dei desaparecidos di Villa Grimaldi a Santiago, il grande centro cileno di detenzione e tortura sotto la dittatura di Pinochet. Un fiume che scorre e il tintinnio delle cascate: è la canzone dell'acqua alla base della cultura dei Selknams, popolazione nativa sudamericana trucidata dai colonizzatori. Due massacri, e la memoria dell'acqua: sono le chiavi narrative per raccontare la storia di un Paese e delle sue ferite ancora aperte, per percorrere il Cile e la sua bellezza, il Cile e la sua violenza.",
+				"vm": 18,
+				"posterName": "LAMEMORIADELLACQUA.jpg",
+				"category": "DOCUMENTARIO",
+				"runtime": "90",
+				"days":
+				[
+				 {
+				 "day": "00/00/2016",
+				 "performances":
+				 [
+				  {
+				  "hour": "20.00",
+				  "freeSeat": 143,
+				  "room": "Amalfi"
+				  },
+				  {
+				  "hour": "20.30",
+				  "freeSeat": 143,
+				  "room": "Amalfi"
+				  }
+				  ]
+				 }
+				 ]
+				},
+				/*{
+				"title": "LO STATO CONTRO FRITZ BAUER",
+				"director": "LARS KRAUME",
+				"actors": "Burghart Klaußner, Ronald Zehrfeld, Lilith Stangenberg, Jörg Schüttauf, Sebastian Blomberg, Laura Tonke, Götz Schubert, Cornelia Gröschel, Robert Atzorn, Michael Schenk, Rüdiger Klink, Matthias Weidenhöfer, Dani Levy",
+				"storyline": "Germania, 1957. Il procuratore generale Fritz Bauer ottiene prove irrefutabili del luogo dove si nasconde Adolf Eichmann. Il tenente colonnello delle SS responsabile della deportazione di massa di milioni di ebrei cela la sua vera identità nella capitale argentina di Buenos Aires. Ebreo lui stesso, da quando è tornato dall'esilio in Danimarca, Bauer sta cercando di portare in giudizio i criminali del Terzo Reich. Tuttavia, finora non è riuscito ad ottenere alcun risultato a causa della feroce determinazione della Germania a rimuovere il suo sinistro passato. Diffidando del sistema giudiziario tedesco, Fritz Bauer contatta il Mossad, i servizi segreti israeliani, e così facendo commette alto tradimento. Ma Bauer non sta cercando di vendicare l'Olocausto: la sua preoccupazione è il futuro della Germania.",
+				"vm": 0,
+				"posterName": "LOSTATOCONTROFRITZBAUER.jpg",
+				"category": "DRAMMATICO",
+				"runtime": "105",
+				"days":
+				[
+				 {
+				 "day": "00/00/2016",
+				 "performances":
+				 [
+				  {
+				  "hour": "20.00",
+				  "freeSeat": 270,
+				  "room": "Venezia"
+				  },
+				  {
+				  "hour": "22.30",
+				  "freeSeat": 270,
+				  "room": "Venezia"
+				  }
+				  ]
+				 }
+				 ]
+				},
+				/*{
+				"title": "BENVENUTI MA NON TROPPO - BENVENUTI MA NON TROPPO",
+				"director": "Alexandra Leclère",
+				"actors": "Karin Viard, Didier Bourdon, Valérie Bonneton, Michel Vuillermoz, Josiane Balasko, Patrick Chesnais, Firmine Richard, Michèle Moretti, Anémone, Jackie Berroyer, Sandra Zidani, Pauline Vaubaillon, Marie-Philomène Nga, Priscilla Adade",
+				"storyline": "A causa di un inverno particolarmente rigido, il governo francese indice misure speciali, obbligando i cittadini più benestanti ad accogliere in casa propria le persone meno fortunate che non possono permettersi un?abitazione. Un vento di panico si scatena in tutta la Francia, soprattutto al civico 86 di rue du Cherche Midi, dove sorge un lussuoso palazzo dell?area più esclusiva del centro parigino. Proprio qui abitano la famiglia Dubreuil, d?estrazione borghese e conservatrice, e i coniugi Bretzel, intellettuali e radical chic. La monotonia del condominio verrà messa a soqquadro da questa coabitazione forzata, e nel confronto con i senzatetto i protagonisti scopriranno la loro indole più autentica.",
+				"vm": 0,
+				"posterName": "BENVENUTIMANONTROPPO.jpg",
+				"category": "COMMEDIA",
+				"runtime": "106",
+				"days":
+				[
+				 {
+				 "day": "00/00/2016",
+				 "performances":
+				 [
+				  {
+				  "hour": "22.30",
+				  "freeSeat": 10,
+				  "room": "Amalfi"
+				  },
+				  {
+				  "hour": "22.20",
+				  "freeSeat": 10,
+				  "room": "Amalfi"
+				  }
+				  ]
+				 }
+				 ]
+				}
+				,
+				{
+				"title": "TARTARUGHE NINJA",
+				"director": "Alexandra Leclère",
+				"actors": "Karin Viard, Didier Bourdon, Valérie Bonneton, Michel Vuillermoz, Josiane Balasko, Patrick Chesnais, Firmine Richard, Michèle Moretti, Anémone, Jackie Berroyer, Sandra Zidani, Pauline Vaubaillon, Marie-Philomène Nga, Priscilla Adade",
+				"storyline": "A causa di un inverno particolarmente rigido, il governo francese indice misure speciali, obbligando i cittadini più benestanti ad accogliere in casa propria le persone meno fortunate che non possono permettersi un?abitazione. Un vento di panico si scatena in tutta la Francia, soprattutto al civico 86 di rue du Cherche Midi, dove sorge un lussuoso palazzo dell?area più esclusiva del centro parigino. Proprio qui abitano la famiglia Dubreuil, d?estrazione borghese e conservatrice, e i coniugi Bretzel, intellettuali e radical chic. La monotonia del condominio verrà messa a soqquadro da questa coabitazione forzata, e nel confronto con i senzatetto i protagonisti scopriranno la loro indole più autentica.",
+				"vm": 14,
+				"posterName": "BENVENUTIMANONTROPPO.jpg",
+				"category": "COMMEDIA",
+				"runtime": "106",
+				"days":
+				[
+				 {
+				 "day": "00/00/2016",
+				 "performances":
+				 [
+				  {
+				  "hour": "22.30",
+				  "freeSeat": 10,
+				  "room": "Amalfi"
+				  },
+				  {
+				  "hour": "20.00",
+				  "freeSeat": 60,
+				  "room": "Amalfi"
+				  }
+				  ]
+				 }
+				 ]
+				} */
+				];
+					
+					
+				$invirtheight = 0;
+				$fnvirtheight = 0;
 				
+				$maxseats = {venezia: 278, amalfi: 143, pisa: 303, genova: 146};
 				
-			$invirtheight = 0;
-			$fnvirtheight = 0;
-			
-			$maxseats = {venezia: 278, amalfi: 143, pisa: 303, genova: 146};
-			
-			getdata();
-						  
-			setInterval(function(){
 				getdata();
-			},
-			560000);
-		});
+							  
+				setInterval(function(){
+					getdata();
+				},
+				560000);
+			});
 		</script>
         
     </head>
-    <body>
-        
-        <table class="monitor">
-        <div class="container"></div>
-        </table>
-        
-    </body>
+		<body>
+			
+			<table class="monitor">
+			<div class="container"></div>
+			</table>
+			
+		</body>
     
 </html>
 
