@@ -6,18 +6,48 @@
         
 		<script type="text/javascript">				// dimensionamento tabella in base al numeri di eventi
 			
-			//return 'none' se niente, 'all' se entrambi, 'one' se ha vm o se ha 3d
+			// controlla se almeno uno degli eventi è in 3D
+			function get3d(events){					
+				var result = 'none';
+				var string3d = false;
+				for (var e = 0; e < events.length; e++) {
+					var event = events[e];
+					var mntitle3darr = cutsecondtitle(event.title);
+					var mntitlestr = "";
+					if (mntitle3darr.length == 3){
+						mntitlestr = mntitle3darr[0];
+						if (mntitle3darr[1] == 1){
+							string3d = true;
+						}
+					}
+														
+					if(string3d == true){
+						return '3D';
+					} else {
+						result = '';
+					}
+														
+					string3d = false;
+					
+				}
+				
+				return result;
+			}
+			
+			
+			
+			//controlla se il film è 3D o VM .. return 'none' se niente, 'all' se entrambi, 'one' se ha vm o se ha 3d
 			function getVmAnd3d(events){
-				let result = 'none';
-				let string3d = false;
-				let vm = false;
-				for (let e = 0; e < events.length; e++) {
-					let event = events[e];
-					let shorttitle3darr = cutsecondtitle(event.title);
-					let shorttitlestr = "";
-					if (shorttitle3darr.length == 2){
-						shorttitlestr = shorttitle3darr[0];
-						if (shorttitle3darr[1] == 1){
+				var result = 'none';
+				var string3d = false;
+				var vm = false;
+				for (var e = 0; e < events.length; e++) {
+					var event = events[e];
+					var mntitle3darr = cutsecondtitle(event.title);
+					var mntitlestr = "";
+					if (mntitle3darr.length == 2){
+						mntitlestr = mntitle3darr[0];
+						if (mntitle3darr[1] == 1){
 							string3d = true;
 						}
 					}
@@ -47,17 +77,29 @@
 			});
 				
 				
-				let VmAnd3d = getVmAnd3d(events);
+				var VmAnd3d = getVmAnd3d(events);
 				console.log(VmAnd3d);
 				
 				var cutwidth = 1000;
 										
 					switch (events.length) {
 					case 1:
-					cutwidth = 900;
+					if (VmAnd3d === 'all'){
+						cutwidth = 850;
+					} else if(VmAnd3d === 'one') {
+						cutwidth = 900;
+					} else {
+						cutwidth = 900;
+					}
 					break;
 					case 2:
-					cutwidth = 900;
+					if (VmAnd3d === 'all'){
+						cutwidth = 850;
+					} else if(VmAnd3d === 'one') {
+						cutwidth = 900;
+					} else {
+						cutwidth = 1000;
+					}
 					break;
 					case 3:
 					if (VmAnd3d === 'all'){
@@ -69,10 +111,22 @@
 					}
 					break;
 					case 4:
-					cutwidth = 990;
+					if (VmAnd3d === 'all'){
+						cutwidth = 850;
+					} else if(VmAnd3d === 'one') {
+						cutwidth = 900;
+					} else {
+						cutwidth = 990;
+					}
 					break;
 					case 5:
-					cutwidth = 940;
+					if (VmAnd3d === 'all'){
+						cutwidth = 850;
+					} else if(VmAnd3d === 'one') {
+						cutwidth = 900;
+					} else {
+						cutwidth = 950;
+					}
 					break;
 					default:
 					cutwidth = 1000;
@@ -125,48 +179,51 @@
 		</script>
 
 
-		/*<script type="text/javascript">				// taglio del secondo titolo e riposizionamento tag 3D
+		<!-- <script type="text/javascript">				// taglio del secondo titolo e riposizionamento tag 3D
 			function cutsecondtitle(title){			
-			var shorttitle3darr = [];
-			var shorttitlestr = title;
-			var shorttitlearr = title.split(" - ");		
+			var mntitle3darr = [];
+			var mntitlestr = title;
+			var mntitlearr = title.split(" - ");		
 			
 			
-			if (shorttitlearr.length > 1) {
-				if (shorttitlearr[0] == "3D") {
-					shorttitle3darr[1] = 1;
-					shorttitle3darr[0] = shorttitlearr[1];
+			if (mntitlearr.length > 1) {
+				if (mntitlearr[0] == "3D") {
+					mntitle3darr[1] = 1;
+					mntitle3darr[0] = mntitlearr[1];
 				} else {
-					shorttitle3darr[1] = 0;
-					shorttitle3darr[0] = shorttitlearr[0];
+					mntitle3darr[1] = 0;
+					mntitle3darr[0] = mntitlearr[0];
 				}
 			}
 			
-			return shorttitle3darr;
+			return mntitle3darr;
 			}
-		</script>*/
+		</script> -->
 		
 		
 		<script type="text/javascript">				// taglio del secondo titolo e riposizionamento tag 3D
 			function cutsecondtitle(title){			
 			
-			var shorttitlestr = title;
+			var color3d = "";
+			var mntitlestr = title;
 			var int3d = 0;
-			var shorttitlearr = title.split(" - ");	
+			var mntitlearr = title.split(" - ");	
 					
 			
 			
-			if (shorttitlearr.length > 1) {
-				if (shorttitlearr[0] == "3D") {
-					shorttitlestr = shorttitlearr[1];
+			if (mntitlearr.length > 1) {
+				if (mntitlearr[0] == "3D") {
+					mntitlestr = mntitlearr[1];
 					int3d = 1;
+					color3d = '#FAE03C';
 				} else {
-					shorttitlestr = shorttitlearr[0];
+					mntitlestr = mntitlearr[0];
 					int3d = 0;
+					color3d = '#282828';
 				}
 			}
-			var shorttitle3darr = [shorttitlestr,int3d];	
-			return shorttitle3darr;
+			var mntitle3darr = [mntitlestr,int3d,color3d];
+			return mntitle3darr;
 			}
 		</script>
  
@@ -174,7 +231,6 @@
         <script type="text/javascript">				// creazione tabella
 			function loaddata(events) {
 				$("table").empty();
-				
 				for (var e = 0; e < events.length; e++) {
 					var event = events[e];
 					var vietato = "";
@@ -188,7 +244,7 @@
 						
 							//...set date; source date = 00/00
 								
-							if (parseInt(event.days[d].day.split("/")[0]) == (new Date).getDate() - 13 && parseInt(event.days[d].day.split("/")[1]) == (new Date).getMonth() + 1 - 9 && parseInt(event.days[d].day.split("/")[2]) == (new Date).getFullYear()) {
+							if (parseInt(event.days[d].day.split("/")[0]) == (new Date).getDate() - 18 && parseInt(event.days[d].day.split("/")[1]) == (new Date).getMonth() + 1 - 9 && parseInt(event.days[d].day.split("/")[2]) == (new Date).getFullYear()) {
 								if (event.days[d].performances.length > 0) {
 									var performances = event.days[d].performances;
 									
@@ -250,19 +306,27 @@
 									
 									}
 									
-									var shorttitle3darr = cutsecondtitle(event.title);
-									var shorttitlestr = "";
+									var is3d = get3d(events);
+									console.log(is3d); 
+									
+									var mntitle3darr = cutsecondtitle(event.title);
+									var mntitlestr = "";
 									var str3d = "";
+									var color3d = "";
 									
-										if (shorttitle3darr.length == 2){
-										shorttitlestr = shorttitle3darr[0];
-											if (shorttitle3darr[1] == 1){
+										if (mntitle3darr.length == 3){
+										mntitlestr = mntitle3darr[0];
+										color3d = mntitle3darr[2];
+											/*if (mntitle3darr[1] == 1){
 												str3d = "3D";
-											}
+											}*/
 										}
+									$("table").append("<tr><td><span class='titolo'>" + mntitlestr + "</span>" + "     " +"<span class='tred'>" + get3d(events) + "</span>" + "<span class='vietato'>" + vietato + "</span>" + "</td><td><span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
 									
-									$("table").append("<tr><td><span class='titolo'>" + shorttitlestr + "</span>" + "     " +"<span class='tred'>" + str3d + "</span>" + "<span class='vietato'>" + vietato + "</span>" + "</td><td><span class='next'>" + nexttime + "<span class=" + signseatscolor(room, seats) + ">" + "  &#9864;" + "</span></td></tr><tr><td><span class='orari'>" + timetable + "</span></td><td><span class='sala'>" + room + "</span>" + "<span class='meno'>" + " - " + "</span>" + "<span class='posti'>" + seats + "</span>" + "</td></tr>");
-
+																											
+									if ($(".tred").length > e) {
+										$(".tred").eq(e).css("background-color", color3d);
+									}
 									$("tr:even td").css("padding-top", padding + "px");
 									$("tr:odd td").css("padding-bottom", padding + "px");
 								}
@@ -322,11 +386,11 @@
 			$(document).ready(function() {
 				$data =  [
 				{
-				"title": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+				"title": "3D - OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
 				"director": "GIULIO BASE",
 				"actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
 				"storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
-				"vm": 14,
+				"vm": 0,
 				"posterName": "LACOPPIADEICAMPIONI.jpg",
 				"category": "COMMEDIA",
 				"runtime": "95",
@@ -351,11 +415,11 @@
 				 ]
 				},
 				{
-				"title": "3D - LA COPPIA DEI CAMPIONI",
+				"title": "LA COPPIA DEI CAMPIONI",
 				"director": "GIULIO BASE",
 				"actors": "Massimo Boldi, Max Tortora, Anna Maria Barbera, Massimo Ceccherini, Matthew T. Reynolds, Enzo Casertano, Ria Antoniou, Valerio Base",
 				"storyline": "Due dipendenti della stessa multinazionale vincono alla lotteria aziendale un paio di biglietti per la finale della Champions League. Uno milanese, l?altro romano, uno benestante e l?altro nullatenente si conoscono per la prima volta all?imbarco per Praga detestandosi a prima vista. Una turbolenza costringe l?aereo a un atterraggio di emergenza in Slovenia e da qui inizia la disavventura dei due che tra liti, vendette e armistizi diventeranno quasi amici. ",
-				"vm": 14,
+				"vm": 0,
 				"posterName": "LACOPPIADEICAMPIONI.jpg",
 				"category": "COMMEDIA",
 				"runtime": "95",
@@ -383,7 +447,7 @@
 				"title": "DA MONET A MATISSE - L'ARTE DI DIPINGERE IL GIARDINO MODERNO",
 				"director": "PATRICIO GUZMAN",
 				"storyline": "Un bottone di madreperla incrostato nella ruggine di una rotaia in fondo al mare: è una traccia dei desaparecidos di Villa Grimaldi a Santiago, il grande centro cileno di detenzione e tortura sotto la dittatura di Pinochet. Un fiume che scorre e il tintinnio delle cascate: è la canzone dell'acqua alla base della cultura dei Selknams, popolazione nativa sudamericana trucidata dai colonizzatori. Due massacri, e la memoria dell'acqua: sono le chiavi narrative per raccontare la storia di un Paese e delle sue ferite ancora aperte, per percorrere il Cile e la sua bellezza, il Cile e la sua violenza.",
-				"vm": 18,
+				"vm": 14,
 				"posterName": "LAMEMORIADELLACQUA.jpg",
 				"category": "DOCUMENTARIO",
 				"runtime": "90",
@@ -436,7 +500,7 @@
 				 }
 				 ]
 				},
-				/*{
+				{
 				"title": "BENVENUTI MA NON TROPPO - BENVENUTI MA NON TROPPO",
 				"director": "Alexandra Leclère",
 				"actors": "Karin Viard, Didier Bourdon, Valérie Bonneton, Michel Vuillermoz, Josiane Balasko, Patrick Chesnais, Firmine Richard, Michèle Moretti, Anémone, Jackie Berroyer, Sandra Zidani, Pauline Vaubaillon, Marie-Philomène Nga, Priscilla Adade",
@@ -518,6 +582,8 @@
 			<table class="monitor">
 			<div class="container"></div>
 			</table>
+			
+			
 			
 		</body>
     
