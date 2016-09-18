@@ -18,8 +18,9 @@
 
 body {
 	overflow-y:hidden;
-	/*background: url("odeon_fluo_2016.jpg") no-repeat fixed center;*/
+	background: url("odeon_fluo_2016.jpg") no-repeat fixed center;*/
 	background-color: #101010; 
+	/*background-position:left top;*/
 	/*cursor: none;*/
 }
 
@@ -117,6 +118,19 @@ tr:nth-of-type(even) td:nth-child(2) {
 	vertical-align: bottom;
 	background-color: #EA4335;
 }
+
+.tred {
+	font-family: "Oswald-regular";
+	font-size: 50%;
+	color: #202020;
+	letter-spacing: 1px;
+	vertical-align: bottom;
+	background-color: #282828;
+}
+
+
+
+
 
 .meno {
     color: #202020;
